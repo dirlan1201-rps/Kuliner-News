@@ -1,2 +1,0 @@
-# KulinerNews
-Info New Kuliner
