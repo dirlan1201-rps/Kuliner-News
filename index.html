@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  
   <div class="container">
     <!-- Header -->
     <header class="site-header">
@@ -21,10 +22,113 @@
       </nav>
     </header>
 
-    <!-- Hero / Cover -->
-    <figure class="cover" id="home">
-      <img src="img/ayamgeprek.png" alt="ayamgeprekmaknyus" />
-    </figure>
+<script>
+  const navLinks = document.querySelectorAll("nav a");
+
+  navLinks.forEach(link => {
+    link.addEventListener("click", function() {
+      navLinks.forEach(nav => nav.classList.remove("active"));
+      this.classList.add("active");
+    });
+  });
+</script>
+
+
+<section class="cover" id="home" aria-label="Hero Slider">
+  <div class="slider" id="hero-slider">
+    <div class="slider-track">
+      <div class="slide"><img src="img/ayamgeprek.png" alt="Ayam Geprek Maknyus"></div>
+      <div class="slide"><img src="img/promo.png" alt="Menu Paket Hemat"></div>
+
+    </div>
+
+    <!-- Tombol panah -->
+    <button class="slider-btn prev" aria-label="Sebelumnya">&#10094;</button>
+    <button class="slider-btn next" aria-label="Berikutnya">&#10095;</button>
+
+    <!-- Indikator -->
+    <div class="slider-dots" aria-label="Indikator">
+      <button aria-label="Slide 1" class="dot active"></button>
+      <button aria-label="Slide 2" class="dot"></button>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ===== Slider dengan autoplay, swipe, tombol, dan dots =====
+  (function(){
+    const slider = document.getElementById('hero-slider');
+    if(!slider) return;
+
+    const track = slider.querySelector('.slider-track');
+    const slides = Array.from(slider.querySelectorAll('.slide'));
+    const prevBtn = slider.querySelector('.prev');
+    const nextBtn = slider.querySelector('.next');
+    const dots = Array.from(slider.querySelectorAll('.dot'));
+
+    const INTERVAL = 4000; // ganti 3000–5000 ms sesuai keinginan
+    let index = 0;
+    let timer = null;
+    let isUserInteracting = false;
+
+    function goTo(i){
+      index = (i + slides.length) % slides.length;
+      track.scrollTo({ left: slides[index].offsetLeft, behavior: 'smooth' });
+      dots.forEach(d=>d.classList.remove('active'));
+      dots[index].classList.add('active');
+    }
+
+    function next(){ goTo(index + 1); }
+    function prev(){ goTo(index - 1); }
+
+    function start(){
+      if(timer) clearInterval(timer);
+      timer = setInterval(()=>{ if(!isUserInteracting) next(); }, INTERVAL);
+    }
+    function stop(){ if(timer) clearInterval(timer); }
+
+    // tombol
+    nextBtn.addEventListener('click', ()=>{ next(); });
+    prevBtn.addEventListener('click', ()=>{ prev(); });
+
+    // dots
+    dots.forEach((dot, i)=> dot.addEventListener('click', ()=> goTo(i)));
+
+    // update index saat di-swipe manual
+    let scrollDebounce;
+    track.addEventListener('scroll', ()=>{
+      if(scrollDebounce) cancelAnimationFrame(scrollDebounce);
+      scrollDebounce = requestAnimationFrame(()=>{
+        const center = track.scrollLeft + track.clientWidth/2;
+        const newIndex = slides.findIndex(sl => 
+          center >= sl.offsetLeft && center < sl.offsetLeft + sl.clientWidth
+        );
+        if(newIndex >= 0 && newIndex !== index){
+          index = newIndex;
+          dots.forEach(d=>d.classList.remove('active'));
+          dots[index].classList.add('active');
+        }
+      });
+    });
+
+    // pause saat hover/drag/touch
+    ['mouseenter','focusin','touchstart','mousedown'].forEach(ev=>{
+      slider.addEventListener(ev, ()=>{ isUserInteracting = true; });
+    });
+    ['mouseleave','focusout','touchend','mouseup','touchcancel'].forEach(ev=>{
+      slider.addEventListener(ev, ()=>{ isUserInteracting = false; });
+    });
+
+    // mulai
+    goTo(0);
+    start();
+
+    // optional: hentikan autoplay saat tab tak aktif agar hemat
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.hidden) stop(); else start();
+    });
+  })();
+</script>
 
     <!-- Artikel -->
     <main class="content">
@@ -59,7 +163,7 @@
       </article>
     </main>
 
-    <!-- ✅ ABOUT SECTION -->
+    <!-- ABOUT SECTION -->
     <section id="about" class="content">
       <h2>About</h2>
       <h3>Temukan beragam pilihan menu lezat yang siap memanjakan lidah Anda:</h3>
@@ -74,7 +178,7 @@
       </p>
     </section>
 
-    <!-- ✅ PRODUCTS SECTION -->
+    <!-- PRODUCTS SECTION -->
     <section id="products" class="content">
       <h2>Products</h2>
       <h3>Temukan beragam pilihan menu lezat yang siap memanjakan lidah anda:</h3>
@@ -86,7 +190,7 @@
       </ul>
     </section>
 
-    <!-- ✅ SERVICES SECTION -->
+    <!-- SERVICES SECTION -->
     <section id="services" class="content">
       <h2>Services</h2>
       <h3>Kami ingin memastikan setiap pelanggan mendapatkan pengalaman terbaik.
@@ -100,7 +204,7 @@
         </ul>
     </section>
 
-    <!-- ✅ CONTACT SECTION -->
+    <!-- CONTACT SECTION -->
     <section id="contact" class="content">
       <h2>Contact</h2>
       <h3>Kami senang mendengar dari Anda! Jika ingin melakukan pemesanan, kerja sama, atau sekadar memberikan masukan, silakan hubungi kami melalui:
